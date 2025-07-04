@@ -1,0 +1,103 @@
+<!-- File: confirmation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Booking Confirmation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e6f2ff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #004080;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+    }
+    header nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    header nav a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      padding: 40px;
+      max-width: 700px;
+      margin: auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    }
+    h2 {
+      color: #004080;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body onload="loadConfirmation()">
+  <header>
+    <div><strong>Customer Portal</strong></div>
+    <nav>
+      <a href="home.html">Home</a>
+      <a href="book.html">Book Ticket</a>
+      <a href="view.html">View Ticket</a>
+      <a href="update.html">Update Details</a>
+      <a href="index.html" onclick="logout()">Logout</a>
+    </nav>
+    <div><strong>Welcome, <span id="usernameDisplay"></span></strong></div>
+  </header>
+
+  <div class="container">
+    <h2>Booking Confirmed</h2>
+    <div id="details"></div>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href="index.html";
+    }
+
+    function loadConfirmation() {
+      const user = localStorage.getItem("loggedInUser");
+      if (!user) {
+        alert("Please login first.");
+        window.location.href = "index.html";
+        return;
+      }
+      document.getElementById("usernameDisplay").innerText = user;
+
+      const booking = JSON.parse(localStorage.getItem("latestBooking"));
+      if (!booking) {
+        document.getElementById("details").innerText = "No booking data available.";
+        return;
+      }
+
+      const detailsHTML = `
+        <p><strong>Booking ID:</strong> ${booking.id}</p>
+        <p><strong>Train:</strong> ${booking.train}</p>
+        <p><strong>Name:</strong> ${booking.name}</p>
+        <p><strong>Boarding Station:</strong> ${booking.boarding}</p>
+        <p><strong>Destination Station:</strong> ${booking.destination}</p>
+        <p><strong>Date:</strong> ${booking.date}</p>
+        <p><strong>Tickets Booked:</strong> ${booking.tickets}</p>
+        <p><strong>Category:</strong> ${booking.category}</p>
+      `;
+      document.getElementById("details").innerHTML = detailsHTML;
+    }
+    
+  </script>
+</body>
+</html>

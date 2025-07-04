@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .link {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    .link a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Login</h2>
+    <input type="text" id="adminUsername" placeholder="Username" required>
+    <input type="password" id="adminPassword" placeholder="Password" required>
+    <button onclick="adminLogin()">Login</button>
+    <div class="link">
+      <p>First time admin? <a href="admin-register.html">Register here</a></p>
+      <p><a href="index.html">Login as Customer</a></p>
+    </div>
+  </div>
+
+  <script>
+    function adminLogin() {
+      const username = document.getElementById("adminUsername").value;
+      const password = document.getElementById("adminPassword").value;
+
+      if (!username || !password) {
+        alert("Please fill in both fields.");
+        return;
+      }
+
+      const adminData = JSON.parse(localStorage.getItem("admin_" + username));
+      if (adminData && adminData.password === password) {
+        localStorage.setItem("loggedInAdmin", username);
+        alert("Admin logged in successfully!");
+        window.location.href = "admin-home.html";
+      } else {
+        alert("Invalid credentials or admin not registered.");
+      }
+    }
+  </script>
+</body>
+</html>

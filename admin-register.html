@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e6f2ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Register</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+    <input type="text" id="mobile" placeholder="Mobile Number">
+    <input type="email" id="email" placeholder="Email">
+    <button onclick="registerAdmin()">Register</button>
+  </div>
+
+  <script>
+    function registerAdmin() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const email = document.getElementById("email").value.trim();
+
+      if (!username || !password || !confirmPassword || !mobile || !email) {
+        alert("All fields are required.");
+        return;
+      }
+
+      if (username.length < 6 || /[^a-zA-Z]/.test(username)) {
+        alert("Username must be at least 6 characters and contain only letters.");
+        return;
+      }
+
+      if (password.length < 8 || 
+          !/[A-Z]/.test(password) || 
+          !/[0-9]/.test(password) || 
+          !/[!@#$%^&*]/.test(password)) {
+        alert("Password must be 8+ characters and include uppercase, number, and special character.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      if (!/^\d{10}$/.test(mobile)) {
+        alert("Mobile number must be 10 digits.");
+        return;
+      }
+
+      if (!email.includes("@") || !/\.\w+$/.test(email)) {
+        alert("Enter a valid email.");
+        return;
+      }
+
+      const adminKey = "admin_" + username;
+      if (localStorage.getItem(adminKey)) {
+        alert("Admin already registered.");
+        return;
+      }
+
+      const adminData = {
+        username,
+        password,
+        mobile,
+        email
+      };
+
+      localStorage.setItem(adminKey, JSON.stringify(adminData));
+      alert("Admin registered successfully!");
+      window.location.href = "admin-login.html";
+    }
+  </script>
+</body>
+</html>

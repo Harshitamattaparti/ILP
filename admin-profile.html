@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f3;
+      margin: 0;
+    }
+
+    .navbar {
+      background-color: #003366;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .navbar a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+    }
+
+    .container {
+      padding: 30px;
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      margin-top: 40px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      color: #003366;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .btn-group {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button.delete {
+      background-color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div><strong>Admin Portal</strong></div>
+    <div>
+      <a href="admin-home.html">Home</a>
+      <a href="admin-register-train.html">Register Train</a>
+      <a href="admin-profile.html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Update Profile</h2>
+    <label>Username:</label>
+    <input type="text" id="username">
+
+    <label>Password:</label>
+    <input type="password" id="password" required>
+
+    <label>Mobile Number:</label>
+    <input type="tel" id="mobile" required pattern="[0-9]{10}">
+
+    <label>Email ID:</label>
+    <input type="email" id="email" required>
+
+    <div class="btn-group">
+      <button onclick="updateProfile()">Update</button>
+      <button class="delete" onclick="deleteProfile()">Delete</button>
+    </div>
+  </div>
+
+  <script>
+    let originalUsername = "";
+
+window.onload = function () {
+  const adminUsername = localStorage.getItem("loggedInAdmin");
+  if (!adminUsername) {
+    alert("Not logged in. Redirecting...");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const adminData = JSON.parse(localStorage.getItem("admin_" + adminUsername));
+  if (adminData) {
+    originalUsername = adminUsername;
+    document.getElementById("username").value = adminData.username;
+    document.getElementById("password").value = adminData.password;
+    document.getElementById("mobile").value = adminData.mobile;
+    document.getElementById("email").value = adminData.email;
+  }
+};
+
+function updateProfile() {
+  const newUsername = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const mobile = document.getElementById("mobile").value.trim();
+  const email = document.getElementById("email").value.trim();
+
+  if (!newUsername || !password || !mobile || !email) {
+    alert("All fields are required.");
+    return;
+  }
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    alert("Mobile number must be 10 digits.");
+    return;
+  }
+
+  if (!email.includes("@") || !email.includes(".")) {
+    alert("Enter a valid email.");
+    return;
+  }
+
+  const updatedAdmin = {
+    username: newUsername,
+    password,
+    mobile,
+    email
+  };
+
+  // Save with new admin key
+  if (newUsername !== originalUsername) {
+    localStorage.removeItem("admin_" + originalUsername);
+  }
+
+  localStorage.setItem("admin_" + newUsername, JSON.stringify(updatedAdmin));
+  localStorage.setItem("loggedInAdmin", newUsername);
+
+  alert("Profile updated successfully.");
+  window.location.href = "admin-home.html";
+}
+  </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+
+<!-- File: login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Login</title>
+  <style>
+    body {
+      background: #eef6ff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 400px;
+    }
+    h2 {
+      color: #004080;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #004080;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #003060;
+    }
+    .register-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .register-link a {
+      color: #004080;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Customer Login</h2>
+    <form onsubmit="return validateLogin()">
+      <input type="text" id="loginUsername" placeholder="Username" required />
+      <input type="password" id="loginPassword" placeholder="Password" required />
+      <div id="loginError" class="error"></div>
+      <button type="submit">Login</button>
+    </form>
+    <div class="register-link">
+      Not registered? <a href="register.html">Register here</a>
+    </div>
+    <div style="margin-top: 20px; text-align: center;">
+  <label>
+    <input type="checkbox" id="adminCheck"> Login as Admin
+  </label>
+  <br>
+  <button onclick="handleAdminRedirect()">Proceed</button>
+</div>
+
+<script>
+  function handleAdminRedirect() {
+    const isAdmin = document.getElementById("adminCheck").checked;
+    if (isAdmin) {
+      window.location.href = "admin-login.html";
+    } else {
+      alert("Please proceed with customer login above.");
+    }
+  }
+</script>
+
+  </div>
+
+  <script>
+    function validateLogin() {
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+      const error = document.getElementById("loginError");
+
+      if (!username || !password) {
+        error.innerText = "Username and Password cannot be empty.";
+        return false;
+      }
+
+      const userData = localStorage.getItem(username);
+      if (!userData) {
+        error.innerText = "User not found. Please register.";
+        return false;
+      }
+
+      const user = JSON.parse(userData);
+      if (user.password !== password) {
+        error.innerText = "Incorrect password.";
+        return false;
+      }
+
+      localStorage.setItem("loggedInUser", username);
+      window.location.href = "home.html";
+      return false;
+    }
+  </script>
+</body>
+</html>
+

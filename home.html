@@ -1,0 +1,133 @@
+<!-- File: home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f0f8ff;
+    }
+    header {
+      background-color: #004080;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+    }
+    header nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    header nav a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      padding: 30px;
+    }
+    h2 {
+      color: #004080;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #d9e6f2;
+    }
+  </style>
+</head>
+<body onload="loadAggregates()">
+  <header>
+    <div><strong>Customer Portal</strong></div>
+    <nav>
+      <a href="home.html">Home</a>
+      <a href="book.html">Book Ticket</a>
+      <a href="view.html">View Ticket</a>
+      <a href="update.html">Update Details</a>
+      <a href="index.html" onclick="logout()">Logout</a>
+    </nav>
+    <div><strong>Welcome, <span id="usernameDisplay"></span></strong></div>
+  </header>
+
+  <div class="container">
+    <h2>Tickets Booked Per Class</h2>
+    <table id="classTable">
+      <tr>
+        <th>Ticket Class</th>
+        <th>Number of Tickets</th>
+      </tr>
+    </table>
+
+    <h2>Sales Done Per Quarter</h2>
+    <table id="salesTable">
+      <tr>
+        <th>Quarter</th>
+        <th>Total Tickets</th>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+    window.location.href = "index.html";
+  }
+
+    function loadAggregates() {
+      const user = localStorage.getItem("loggedInUser");
+      if (!user) {
+        alert("Please login first.");
+        window.location.href = "index.html";
+        return;
+      }
+      document.getElementById("usernameDisplay").innerText = user;
+
+      const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+      const classCount = {
+        "First Class": 0,
+        "AC Tier 1": 0,
+        "AC Tier 2": 0,
+        "Tatkal": 0
+      };
+
+      const quarterSales = {
+        "Q1": 0, "Q2": 0, "Q3": 0, "Q4": 0
+      };
+
+      bookings.forEach(b => {
+        classCount[b.category] = (classCount[b.category] || 0) + parseInt(b.tickets);
+        const month = new Date(b.date).getMonth() + 1;
+        const quarter = month <= 3 ? "Q1" : month <= 6 ? "Q2" : month <= 9 ? "Q3" : "Q4";
+        quarterSales[quarter] += parseInt(b.tickets);
+      });
+
+      let classTable = document.getElementById("classTable");
+      Object.entries(classCount).forEach(([key, value]) => {
+        const row = classTable.insertRow();
+        row.innerHTML = `<td>${key}</td><td>${value}</td>`;
+      });
+
+      let salesTable = document.getElementById("salesTable");
+      Object.entries(quarterSales).forEach(([key, value]) => {
+        const row = salesTable.insertRow();
+        row.innerHTML = `<td>${key}</td><td>${value}</td>`;
+      });
+    }
+    
+  </script>
+</body>
+</html>

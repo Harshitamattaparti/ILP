@@ -1,0 +1,140 @@
+<!-- File: view.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Ticket</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+    }
+    header {
+      background-color: #004080;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+    }
+    header nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    header nav a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label, input, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+    }
+    button {
+      background-color: #004080;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0066cc;
+    }
+    .ticket-details {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e6f0ff;
+      border-radius: 8px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body onload="loadUser()">
+  <header>
+    <div><strong>Customer Portal</strong></div>
+    <nav>
+      <a href="home.html">Home</a>
+      <a href="book.html">Book Ticket</a>
+      <a href="view.html">View Ticket</a>
+      <a href="update.html">Update Details</a>
+      <a href="index.html" onclick="logout()">Logout</a>
+    </nav>
+    <div><strong>Welcome, <span id="usernameDisplay"></span></strong></div>
+  </header>
+
+  <div class="container">
+    <h2>View Your Ticket</h2>
+    <label for="ticketId">Enter Ticket ID:</label>
+    <input type="text" id="ticketId" />
+    <button onclick="viewTicket()">View Ticket</button>
+
+    <div id="ticketDetails" class="ticket-details hidden"></div>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "index.html";
+    }
+
+    function loadUser() {
+      const user = localStorage.getItem("loggedInUser");
+      if (!user) {
+        alert("Please login first.");
+        window.location.href = "index.html";
+      }
+      document.getElementById("usernameDisplay").innerText = user;
+    }
+
+    function viewTicket() {
+      const ticketId = document.getElementById("ticketId").value.trim();
+      const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+      const user = localStorage.getItem("loggedInUser");
+
+      const ticket = bookings.find(t => t.id === ticketId && t.user === user);
+      const detailsDiv = document.getElementById("ticketDetails");
+
+      if (ticket) {
+        detailsDiv.classList.remove("hidden");
+        detailsDiv.innerHTML = `
+          <p><strong>Ticket ID:</strong> ${ticket.id}</p>
+          <p><strong>Train ID:</strong> ${ticket.train}</p>
+          <p><strong>User ID:</strong> ${user}</p>
+          <p><strong>Username:</strong> ${ticket.name}</p>
+          <p><strong>Boarding Station:</strong> ${ticket.boarding}</p>
+          <p><strong>Destination Station:</strong> ${ticket.destination}</p>
+          <p><strong>Date:</strong> ${ticket.date}</p>
+          <p><strong>Tickets Booked:</strong> ${ticket.tickets}</p>
+          <button onclick="cancelTicket('${ticketId}')">Cancel Ticket</button>
+        `;
+      } else {
+        detailsDiv.classList.remove("hidden");
+        detailsDiv.innerHTML = "<p style='color:red;'>Ticket not found or already cancelled.</p>";
+      }
+    }
+
+    function cancelTicket(ticketId) {
+      if (confirm("Are you sure you want to cancel this ticket?")) {
+        let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+        bookings = bookings.filter(t => t.id !== ticketId);
+        localStorage.setItem("bookings", JSON.stringify(bookings));
+        document.getElementById("ticketDetails").innerHTML = "<p style='color:red;'>Ticket successfully cancelled.</p>";
+      }
+    }
+    
+  </script>
+</body>
+</html>

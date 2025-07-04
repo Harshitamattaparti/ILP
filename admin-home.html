@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+    }
+
+    .navbar {
+      background-color: #003366;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .navbar a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    h2 {
+      color: #003366;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #999;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #003366;
+      color: white;
+    }
+
+    button {
+      background: #d9534f;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #c9302c;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div><strong>Admin Portal</strong></div>
+    <div>
+      <a href="admin-home.html">Home</a>
+      <a href="admin-register-train.html">Register Train</a>
+      <a href="admin-profile.html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Ticket Summary (Aggregate Table)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Class</th>
+          <th>Tickets Booked</th>
+        </tr>
+      </thead>
+      <tbody id="classTable">
+        <!-- Filled by JS -->
+      </tbody>
+    </table>
+
+    <h2>Sales per Quarter</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Quarter</th>
+          <th>Sales</th>
+        </tr>
+      </thead>
+      <tbody id="salesTable">
+        <!-- Filled by JS -->
+      </tbody>
+    </table>
+
+    <h2>Customer Table</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Username</th>
+          <th>Mobile</th>
+          <th>Tickets Booked</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody id="customerTable">
+        <!-- Filled by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("loggedInAdmin");
+      window.location.href = "admin-login.html";
+    }
+
+    window.onload = function () {
+      if (!localStorage.getItem("loggedInAdmin")) {
+        alert("Admin not logged in");
+        window.location.href = "admin-login.html";
+      }
+
+      loadClassStats();
+      loadQuarterSales();
+      loadCustomerData();
+    };
+
+    function loadClassStats() {
+      const stats = JSON.parse(localStorage.getItem("classStats")) || {
+        "First Class": 0,
+        "AC Tier 1": 0,
+        "AC Tier 2": 2,
+        "Tatkal": 0
+      };
+
+      const tbody = document.getElementById("classTable");
+      tbody.innerHTML = "";
+
+      for (let cls in stats) {
+        const row = `<tr><td>${cls}</td><td>${stats[cls]}</td></tr>`;
+        tbody.innerHTML += row;
+      }
+    }
+
+    function loadQuarterSales() {
+      const sales = JSON.parse(localStorage.getItem("quarterSales")) || {
+        Q1: 0,
+        Q2: 0,
+        Q3: 0,
+        Q4: 3
+      };
+
+      const tbody = document.getElementById("salesTable");
+      tbody.innerHTML = "";
+
+      for (let q in sales) {
+        const row = `<tr><td>${q}</td><td>${sales[q]}</td></tr>`;
+        tbody.innerHTML += row;
+      }
+    }
+
+ function loadCustomerData() {
+  const tableBody = document.getElementById("customerTable");
+  tableBody.innerHTML = "";
+
+  Object.keys(localStorage).forEach((key) => {
+    if (!key.startsWith("admin_") && !["loggedInAdmin", "loggedInUser"].includes(key)) {
+      const user = JSON.parse(localStorage.getItem(key));
+      if (user && user.username) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${key}</td>
+          <td>${user.username}</td>
+          <td>${user.mobile}</td>
+          <td>${user.ticketsBooked || 0}</td>
+          <td><button onclick="deleteCustomer('${key}')">Delete</button></td>
+        `;
+        tableBody.appendChild(tr);
+      }
+    }
+  });
+}
+
+
+    function deleteUser(userKey) {
+      if (confirm("Are you sure you want to delete this user?")) {
+        localStorage.removeItem(userKey);
+        loadCustomerData();
+      }
+    }
+  </script>
+</body>
+</html>

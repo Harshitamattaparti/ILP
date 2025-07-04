@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customer Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e6f2ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .register-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #003366;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      color: #333;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #004080;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .error {
+      color: red;
+      font-size: 0.85em;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h2>Register</h2>
+    <form onsubmit="return validateRegister()">
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="username" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="password" />
+      </div>
+      <div class="input-group">
+        <label>Confirm Password</label>
+        <input type="password" id="confirmPassword" />
+      </div>
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="email" />
+      </div>
+      <div class="input-group">
+        <label>Mobile Number</label>
+        <input type="text" id="mobile" />
+      </div>
+      <div class="input-group">
+        <label>Aadhar Number</label>
+        <input type="text" id="aadhar" />
+      </div>
+      <div class="error" id="registerError"></div>
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script>
+    function validateRegister() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const email = document.getElementById("email").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const aadhar = document.getElementById("aadhar").value.trim();
+      const error = document.getElementById("registerError");
+
+      const usernameRegex = /^[A-Za-z]{6,}$/;
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const mobileRegex = /^[0-9]{10}$/;
+
+      if (!username || !usernameRegex.test(username)) {
+        error.innerText = "Username must be at least 6 characters long and only contain letters.";
+        return false;
+      }
+      if (!password || !passwordRegex.test(password)) {
+        error.innerText = "Password must be 8+ characters with an uppercase, number, and special character.";
+        return false;
+      }
+      if (!confirmPassword || confirmPassword !== password) {
+        error.innerText = "Confirm Password must match the Password.";
+        return false;
+      }
+      if (!email || !emailRegex.test(email)) {
+        error.innerText = "Enter a valid email (e.g., user@gmail.com).";
+        return false;
+      }
+      if (!mobile || !mobileRegex.test(mobile)) {
+        error.innerText = "Mobile number must be 10 digits and numeric only.";
+        return false;
+      }
+      if (!aadhar) {
+        error.innerText = "Aadhar number is required.";
+        return false;
+      }
+
+      const userData = {
+        username,
+        password,
+        email,
+        mobile,
+        aadhar
+      };
+      localStorage.setItem(username, JSON.stringify(userData));
+      alert("Registration Successful!");
+      window.location.href = "index.html";
+      return false;
+    }
+  </script>
+</body>
+</html>

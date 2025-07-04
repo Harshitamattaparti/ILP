@@ -1,0 +1,152 @@
+<!-- File: book.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Book Ticket</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #004080;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+    }
+    header nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    header nav a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      padding: 30px;
+      max-width: 700px;
+      margin: auto;
+    }
+    h2 {
+      color: #004080;
+      margin-bottom: 20px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #004080;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #003060;
+    }
+  </style>
+</head>
+<body onload="initBooking()">
+  <header>
+    <div><strong>Customer Portal</strong></div>
+    <nav>
+      <a href="home.html">Home</a>
+      <a href="book.html">Book Ticket</a>
+      <a href="view.html">View Ticket</a>
+      <a href="update.html">Update Details</a>
+      <a href="index.html" onclick="logout()">Logout</a>
+    </nav>
+    <div><strong>Welcome, <span id="usernameDisplay"></span></strong></div>
+  </header>
+
+  <div class="container">
+    <h2>Book a Ticket</h2>
+    <form id="ticketForm" onsubmit="return bookTicket()">
+      <input type="text" id="bookingId" readonly />
+      <input type="text" id="name" placeholder="Name" required />
+      <input type="text" id="mobile" placeholder="Mobile Number" required />
+      <input type="number" id="age" placeholder="Age" required min="0" />
+      <input type="date" id="date" required />
+      <input type="text" id="boarding" placeholder="Boarding Station" required />
+      <input type="text" id="destination" placeholder="Destination Station" required />
+      <select id="category" required>
+        <option value="">Select Ticket Category</option>
+        <option value="First Class">First Class</option>
+        <option value="AC Tier 1">AC Tier 1</option>
+        <option value="AC Tier 2">AC Tier 2</option>
+        <option value="Tatkal">Tatkal</option>
+      </select>
+      <select id="train" required>
+        <option value="">Select Train</option>
+        <option value="Rajdhani">Rajdhani</option>
+        <option value="Seshadri">Seshadri</option>
+        <option value="Gowthami">Gowthami</option>
+        <option value="Cocanada">Cocanada</option>
+      </select>
+      <input type="number" id="tickets" placeholder="Number of Tickets" required min="1" />
+      <button type="submit">Book Ticket</button>
+    </form>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "index.html";
+    }
+
+    function initBooking() {
+      const user = localStorage.getItem("loggedInUser");
+      if (!user) {
+        alert("Please login first.");
+        window.location.href = "index.html";
+        return;
+      }
+      document.getElementById("usernameDisplay").innerText = user;
+      document.getElementById("bookingId").value = "TICKET" + Math.floor(Math.random() * 100000);
+    }
+
+    function bookTicket() {
+      const id = document.getElementById("bookingId").value;
+      const name = document.getElementById("name").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const age = document.getElementById("age").value.trim();
+      const date = document.getElementById("date").value;
+      const boarding = document.getElementById("boarding").value.trim();
+      const destination = document.getElementById("destination").value.trim();
+      const category = document.getElementById("category").value;
+      const train = document.getElementById("train").value;
+      const tickets = document.getElementById("tickets").value;
+      const user = localStorage.getItem("loggedInUser");
+
+      if (!/^[0-9]{10}$/.test(mobile)) {
+        alert("Mobile number must be 10 digits and only numbers.");
+        return false;
+      }
+
+      const booking = {
+        id, name, mobile, age, date, boarding, destination, category, train, tickets, user
+      };
+
+      let bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+      bookings.push(booking);
+      localStorage.setItem("bookings", JSON.stringify(bookings));
+
+      localStorage.setItem("latestBooking", JSON.stringify(booking));
+      window.location.href = "confirmation.html";
+      return false;
+    }
+
+  </script>
+</body>
+</html>

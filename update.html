@@ -1,0 +1,664 @@
+<!-- File: update.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Update Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f7;
+      margin: 0;
+    }
+    header {
+      background-color: #004080;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+    }
+    header nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    header nav a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, label, select, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #004080;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0066cc;
+    }
+    .password-section {
+      display: none;
+    }
+  </style>
+</head>
+<body onload="loadUserDetails()">
+  <header>
+    <div><strong>Customer Portal</strong></div>
+    <nav>
+      <a href="home.html">Home</a>
+      <a href="book.html">Book Ticket</a>
+      <a href="view.html">View Ticket</a>
+      <a href="update.html">Update Details</a>
+      <a href="index.html" onclick="logout()">Logout</a>
+    </nav>
+    <div><strong>Welcome, <span id="usernameDisplay"></span></strong></div>
+  </header>
+
+  <div class="container">
+    <h2>Update Your Details</h2>
+    <label>Email</label>
+    <input type="email" id="email" />
+
+    <label>Mobile Number</label>
+    <input type="text" id="mobile" />
+
+    <!--<label>Address</label>
+    <input type="text" id="address" />-->
+
+    <label><input type="checkbox" id="changePasswordToggle" onchange="togglePasswordSection()" /> Change Password</label>
+
+    <div class="password-section" id="passwordSection">
+      <label>Current Password</label>
+      <input type="password" id="currentPassword" />
+
+      <label>New Password</label>
+      <input type="password" id="newPassword" />
+
+      <label>Confirm New Password</label>
+      <input type="password" id="confirmPassword" />
+    </div>
+
+    <button onclick="updateDetails()">Update</button>
+  </div>
+
+  <script>
+    window.onload = function() {
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    if (!loggedInUser) {
+        alert("User not logged in. Redirecting to login.");
+        window.location.href = "index.html";
+    } else {
+        document.getElementById("usernameDisplay").innerText = loggedInUser;
+        // Populate the current details for user from localStorage
+        populateUserDetails(loggedInUser);
+    }
+};
+
+function populateUserDetails(username) {
+    const userDetails = JSON.parse(localStorage.getItem(username));
+    if (userDetails) {
+        document.getElementById("email").value = userDetails.email;
+        document.getElementById("mobile").value = userDetails.mobile;
+        //document.getElementById("address").value = userDetails.address;
+    } else {
+        alert("User details not found.");
+    }
+}
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "index.html";
+    }
+
+    function togglePasswordSection() {
+      document.getElementById("passwordSection").style.display = document.getElementById("changePasswordToggle").checked ? "block" : "none";
+    }
+
+    function loadUserDetails() {
+      const username = localStorage.getItem("loggedInUser");
+      if (!username) {
+        alert("Please login first.");
+        window.location.href = "index.html";
+        return;
+      }
+      document.getElementById("usernameDisplay").innerText = username;
+
+      const userData = JSON.parse(localStorage.getItem("users")) || [];
+      const user = userData.find(u => u.username === username);
+
+      if (user) {
+        document.getElementById("email").value = user.email || "";
+        document.getElementById("mobile").value = user.mobile || "";
+        //document.getElementById("address").value = user.address || "";
+      }
+    }
+
+    function updateDetails() {
+      const email = document.getElementById("email").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      //const address = document.getElementById("address").value.trim();
+
+      const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      const mobilePattern = /^\d{10}$/;
+
+      if (!emailPattern.test(email)) return alert("Invalid email.");
+      if (!mobilePattern.test(mobile)) return alert("Mobile must be 10 digits.");
+      //if (address === "") return alert("Address cannot be empty.");
+
+      const username = localStorage.getItem("loggedInUser");
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+      const user = users.find(u => u.username === username);
+
+      if (!user) return alert("User not found.");
+
+      user.email = email;
+      user.mobile = mobile;
+      //user.address = address;
+
+      if (document.getElementById("changePasswordToggle").checked) {
+        const currentPassword = document.getElementById("currentPassword").value.trim();
+        const newPassword = document.getElementById("newPassword").value.trim();
+        const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+        if (currentPassword !== user.password) return alert("Current password is incorrect.");
+        if (newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/\d/.test(newPassword) || !/[^a-zA-Z0-9]/.test(newPassword)) return alert("New password must be strong.");
+        if (newPassword !== confirmPassword) return alert("Passwords do not match.");
+
+        user.password = newPassword;
+      }
+
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("Details updated successfully.");
+    }
+    
+  </script>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Update Password</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f6fa;
+      padding: 20px;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    form {
+      max-width: 400px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 15px;
+      background-color: #3498db;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      width: 100%;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h2>Update Password</h2>
+  <form id="updateForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required>
+
+    <label for="currentPassword">Current Password:</label>
+    <input type="password" id="currentPassword" required>
+
+    <label for="newPassword">New Password:</label>
+    <input type="password" id="newPassword" required>
+
+    <label for="confirmPassword">Confirm New Password:</label>
+    <input type="password" id="confirmPassword" required>
+
+    <button type="button" onclick="updatePassword()">Update Password</button>
+  </form>
+
+  <script>
+    function validatePassword(password) {
+      return (
+        password.length >= 8 &&
+        /[A-Z]/.test(password) &&
+        /[0-9]/.test(password) &&
+        /[!@#$%^&*]/.test(password)
+      );
+    }
+
+    function updatePassword() {
+      const username = document.getElementById("username").value.trim();
+      const currentPassword = document.getElementById("currentPassword").value;
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (!username || !currentPassword || !newPassword || !confirmPassword) {
+        alert("Please fill out all fields.");
+        return;
+      }
+
+      const userData = JSON.parse(localStorage.getItem(username));
+      if (!userData) {
+        alert("User not found.");
+        return;
+      }
+
+      if (userData.password !== currentPassword) {
+        alert("Current password is incorrect.");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        alert("New password and confirm password do not match.");
+        return;
+      }
+
+      if (!validatePassword(newPassword)) {
+        alert("Password must be at least 8 characters long and contain 1 uppercase letter, 1 number, and 1 special character.");
+        return;
+      }
+
+      userData.password = newPassword;
+      localStorage.setItem(username, JSON.stringify(userData));
+      alert("Password updated successfully.");
+    }
+  </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Update Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #444;
+    }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .password-section {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Update Details</h2>
+    <p><strong>Logged in as:</strong> <span id="usernameDisplay"></span></p>
+
+    <form id="updateForm">
+      <label>Email</label>
+      <input type="email" id="email" required>
+
+      <label>Mobile Number</label>
+      <input type="text" id="mobile" required>
+
+      <label>Address</label>
+      <input type="text" id="address" required>
+
+      <label>
+        <input type="checkbox" id="changePasswordCheckbox"> Update Password
+      </label>
+
+      <div class="password-section" id="passwordSection">
+        <label>Current Password</label>
+        <input type="password" id="currentPassword">
+
+        <label>New Password</label>
+        <input type="password" id="newPassword">
+
+        <label>Confirm Password</label>
+        <input type="password" id="confirmPassword">
+      </div>
+
+      <button type="button" onclick="updateDetails()">Update Details</button>
+    </form>
+  </div>
+
+  <script>
+    const loggedInUser = localStorage.getItem("loggedInUser");
+
+    if (!loggedInUser) {
+      alert("User not logged in.");
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("usernameDisplay").textContent = loggedInUser;
+      const user = JSON.parse(localStorage.getItem(loggedInUser));
+      if (user) {
+        document.getElementById("email").value = user.email || "";
+        document.getElementById("mobile").value = user.mobile || "";
+        document.getElementById("address").value = user.address || "";
+      }
+    }
+
+    document.getElementById("changePasswordCheckbox").addEventListener("change", function () {
+      document.getElementById("passwordSection").style.display = this.checked ? "block" : "none";
+    });
+
+    function updateDetails() {
+      const email = document.getElementById("email").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const changePassword = document.getElementById("changePasswordCheckbox").checked;
+
+      if (!email.includes("@") || !email.includes(".")) {
+        alert("Invalid email format.");
+        return;
+      }
+      if (!/^\d{10}$/.test(mobile)) {
+        alert("Mobile number must be 10 digits.");
+        return;
+      }
+      if (address.length < 3) {
+        alert("Address is too short.");
+        return;
+      }
+
+      const user = JSON.parse(localStorage.getItem(loggedInUser));
+      if (!user) {
+        alert("User not found.");
+        return;
+      }
+
+      // If password update is selected
+      if (changePassword) {
+        const currentPassword = document.getElementById("currentPassword").value;
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          alert("Please fill all password fields.");
+          return;
+        }
+        if (currentPassword !== user.password) {
+          alert("Current password is incorrect.");
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          alert("New password and confirm password do not match.");
+          return;
+        }
+        if (newPassword.length < 8 ||
+            !/[A-Z]/.test(newPassword) ||
+            !/[0-9]/.test(newPassword) ||
+            !/[!@#$%^&*]/.test(newPassword)) {
+          alert("New password must be at least 8 characters long and contain an uppercase letter, a number, and a special character.");
+          return;
+        }
+
+        user.password = newPassword;
+      }
+
+      user.email = email;
+      user.mobile = mobile;
+      user.address = address;
+
+      localStorage.setItem(loggedInUser, JSON.stringify(user));
+      alert("Details updated successfully.");
+    }
+  </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Update Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #444;
+    }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .password-section {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Update Details</h2>
+    <p><strong>Logged in as:</strong> <span id="usernameDisplay"></span></p>
+
+    <form id="updateForm">
+      <label>Email</label>
+      <input type="email" id="email" required>
+
+      <label>Mobile Number</label>
+      <input type="text" id="mobile" required>
+
+      <label>Address</label>
+      <input type="text" id="address" required>
+
+      <label>
+        <input type="checkbox" id="changePasswordCheckbox"> Update Password
+      </label>
+
+      <div class="password-section" id="passwordSection">
+        <label>Current Password</label>
+        <input type="password" id="currentPassword">
+
+        <label>New Password</label>
+        <input type="password" id="newPassword">
+
+        <label>Confirm Password</label>
+        <input type="password" id="confirmPassword">
+      </div>
+
+      <button type="button" onclick="updateDetails()">Update Details</button>
+    </form>
+  </div>
+
+  <script>
+    const loggedInUser = localStorage.getItem("loggedInUser");
+
+    if (!loggedInUser) {
+      alert("User not logged in.");
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("usernameDisplay").textContent = loggedInUser;
+      const user = JSON.parse(localStorage.getItem(loggedInUser));
+      if (user) {
+        document.getElementById("email").value = user.email || "";
+        document.getElementById("mobile").value = user.mobile || "";
+        document.getElementById("address").value = user.address || "";
+      }
+    }
+
+    document.getElementById("changePasswordCheckbox").addEventListener("change", function () {
+      document.getElementById("passwordSection").style.display = this.checked ? "block" : "none";
+    });
+
+    function updateDetails() {
+      const email = document.getElementById("email").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const changePassword = document.getElementById("changePasswordCheckbox").checked;
+
+      if (!email.includes("@") || !email.includes(".")) {
+        alert("Invalid email format.");
+        return;
+      }
+      if (!/^\d{10}$/.test(mobile)) {
+        alert("Mobile number must be 10 digits.");
+        return;
+      }
+      if (address.length < 3) {
+        alert("Address is too short.");
+        return;
+      }
+
+      const user = JSON.parse(localStorage.getItem(loggedInUser));
+      if (!user) {
+        alert("User not found.");
+        return;
+      }
+
+      if (changePassword) {
+        const currentPassword = document.getElementById("currentPassword").value;
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          alert("Please fill all password fields.");
+          return;
+        }
+        if (currentPassword !== user.password) {
+          alert("Current password is incorrect.");
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          alert("New password and confirm password do not match.");
+          return;
+        }
+        if (newPassword.length < 8 ||
+            !/[A-Z]/.test(newPassword) ||
+            !/[0-9]/.test(newPassword) ||
+            !/[!@#$%^&*]/.test(newPassword)) {
+          alert("New password must be at least 8 characters long and contain an uppercase letter, a number, and a special character.");
+          return;
+        }
+
+        user.password = newPassword;
+      }
+
+      user.email = email;
+      user.mobile = mobile;
+      user.address = address;
+
+      localStorage.setItem(loggedInUser, JSON.stringify(user));
+      alert("Details updated successfully.");
+      window.location.href = "home.html"; // Redirect to home page after update
+    }
+  </script>
+</body>
+</html>
+

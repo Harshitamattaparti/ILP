@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register Train</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
+
+    .navbar {
+      background-color: #003366;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .navbar a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+    }
+
+    .container {
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #003366;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #002244;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div><strong>Admin Portal</strong></div>
+    <div>
+      <a href="admin-home.html">Home</a>
+      <a href="admin-register-train.html">Register Train</a>
+      <a href="admin-profile.html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Register a Train</h2>
+    <form id="trainForm">
+      <label for="trainName">Train Name</label>
+      <input type="text" id="trainName" required>
+
+      <label for="seats">Number of Seats</label>
+      <input type="number" id="seats" min="1" required>
+
+      <label for="from">From</label>
+      <input type="text" id="from" required>
+
+      <label for="to">To</label>
+      <input type="text" id="to" required>
+
+      <label for="ownership">Ownership</label>
+      <select id="ownership" required>
+        <option value="">Select Ownership</option>
+        <option value="Government">Government</option>
+        <option value="Private">Private</option>
+      </select>
+
+      <button type="submit">Register Train</button>
+    </form>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("loggedInAdmin");
+      window.location.href = "login.html";
+    }
+
+    document.getElementById("trainForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const trainName = document.getElementById("trainName").value.trim();
+      const seats = parseInt(document.getElementById("seats").value);
+      const from = document.getElementById("from").value.trim();
+      const to = document.getElementById("to").value.trim();
+      const ownership = document.getElementById("ownership").value;
+
+      if (!trainName || !seats || !from || !to || !ownership) {
+        alert("Please fill all fields correctly.");
+        return;
+      }
+
+      const trainId = `train_${Date.now()}`;
+      const train = {
+        trainName,
+        seats,
+        from,
+        to,
+        ownership,
+        id: trainId
+      };
+
+      // Store train in train list
+      const trains = JSON.parse(localStorage.getItem("trainList")) || [];
+      trains.push(train);
+      localStorage.setItem("trainList", JSON.stringify(trains));
+
+      alert("Train registered successfully!");
+      window.location.href = "admin-home.html";
+    });
+  </script>
+</body>
+</html>
